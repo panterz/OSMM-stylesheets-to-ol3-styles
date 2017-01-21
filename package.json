@@ -1,0 +1,19 @@
+{
+  "name": "osmm-stylesheets-to-ol3-styles",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panterz/OSMM-stylesheets-to-ol3-styles.git"
+  },
+  "author": "panterz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/panterz/OSMM-stylesheets-to-ol3-styles/issues"
+  },
+  "homepage": "https://github.com/panterz/OSMM-stylesheets-to-ol3-styles#readme"
+}
