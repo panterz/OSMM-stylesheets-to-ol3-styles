@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import program from 'commander';
+import xml2json from 'xml2json';
 
 class Convertor {
     constructor (args){
@@ -7,7 +8,29 @@ class Convertor {
     }
 
     convert() {
+        const sld = "OSMM-Topography-Layer-stylesheets/Schema version 9/Stylesheets/Geoserver stylesheets (SLD)/topographicarea-standard.sld.sld";
 
+        let xml = fs.readFileSync(sld, 'utf8');
+
+        // xml to json
+        let json = xml2json.toJson(xml, {
+            object: true
+            //arrayNotation: true
+        });
+
+        let styles = json.StyledLayerDescriptor.NamedLayer.UserStyle.FeatureTypeStyle;
+        //console.log(styles)
+
+        for(let i = 0; i<styles.length; i++ ) {
+            let rule = styles[i].Rule;
+            for(let key in rule) {
+                //if(ogc:PropertyIsEqualTo === "")
+                //console.log(key)
+                let name = rule.Name;
+                console.log(name);
+            }
+            //console.log(styles[i].Rule["ogc:Filter"]);
+        }
     }
 }
 
