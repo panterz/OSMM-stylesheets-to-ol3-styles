@@ -15,5 +15,16 @@
   "bugs": {
     "url": "https://github.com/panterz/OSMM-stylesheets-to-ol3-styles/issues"
   },
-  "homepage": "https://github.com/panterz/OSMM-stylesheets-to-ol3-styles#readme"
+  "homepage": "https://github.com/panterz/OSMM-stylesheets-to-ol3-styles#readme",
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.22.2",
+    "babel-preset-es2015": "^6.22.0",
+    "commander": "^2.9.0",
+    "eslint": "^3.15.0",
+    "mocha": "^3.2.0"
+  },
+  "dependencies": {
+    "xml2json": "^0.11.0"
+  }
 }
