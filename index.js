@@ -4,13 +4,30 @@ import xml2json from 'xml2json';
 
 class Convertor {
     constructor (args){
-        this.args = args;
+        const path = "OSMM-Topography-Layer-stylesheets/Schema version " + args.schemaVersion +
+                    "/Stylesheets/Geoserver stylesheets (SLD)/";
+        const slds = {
+            7: {
+                "topographicarea-backdrop": "OSMM Topo - Topographic Area.sld",
+                "topographicline-backdrop": "OSMM Topo - Topographic Lines.sld",
+                "topographicarea-standard": "OSMM Topo - Topographic Area.sld",
+                "topographicline-standard": "OSMM Topo - Topographic Lines.sld"
+            },
+            9: {
+                "topographicarea-backdrop": "topographicarea-backdrop.sld.sld",
+                "topographicline-backdrop": "topographicline-backdrop.sld.sld",
+                "topographicarea-standard": "topographicarea-standard.sld.sld",
+                "topographicline-standard": "topographicline-standard.sld.sld"
+            }
+
+        };
+
+        this.sld = path + slds[args.schemaVersion][args.style];
+        this.name = args.style + "_"  + args.schemaVersion;
     }
 
     convert() {
-        const sld = "OSMM-Topography-Layer-stylesheets/Schema version 9/Stylesheets/Geoserver stylesheets (SLD)/topographicline-standard.sld.sld";
-
-        let xml = fs.readFileSync(sld, 'utf8');
+        let xml = fs.readFileSync(this.sld, 'utf8');
         let styles = [];
 
         // xml to json
@@ -19,10 +36,8 @@ class Convertor {
             //arrayNotation: true
         });
 
-        console.log(json.StyledLayerDescriptor.NamedLayer.UserStyle)
         let stylesFromSld = json.StyledLayerDescriptor.NamedLayer.UserStyle.FeatureTypeStyle;
 
-        console.log(stylesFromSld.length)
 
         for(let i = 0; i<stylesFromSld.length; i++ ) {
 
@@ -33,7 +48,6 @@ class Convertor {
                 switch(attribute) {
                     case "Name":
                         style.name = rule.Name;
-                        console.log(rule.Name)
                         break;
                     case "ogc:Filter":
                         style.filter = this._ogcFilterToObject(rule[attribute]);
@@ -46,7 +60,7 @@ class Convertor {
             styles.push(style);
         }
 
-        console.log(JSON.stringify(styles));
+        fs.writeFile('export/'+this.name+'.json', JSON.stringify(styles, null, 4));
     }
 
     _getStyleFromSLD(styleObj) {
@@ -64,6 +78,7 @@ class Convertor {
 
     _getStrokeStyle(strokeStyleObj) {
         let strokeStyle = {};
+        let factor = 10;
 
         Object.keys(strokeStyleObj).forEach((styleType) => {
             strokeStyleObj[styleType].forEach((style) => {
@@ -72,13 +87,13 @@ class Convertor {
                         strokeStyle.colour = this._hexToRgb(style["$t"]);
                         break;
                     case "stroke-width":
-                        strokeStyle.width = parseFloat(style["$t"]) * 10;
+                        strokeStyle.width = this._roundNumber(parseFloat(style["$t"]) * factor, 2);
                         break;
                     case "stroke-dasharray":
                         let lineDash = [];
 
                         style["$t"].split(" ").forEach((element) => {
-                            lineDash.push(parseFloat(element) * 10);
+                            lineDash.push(this._roundNumber(parseFloat(element) * factor, 2));
                         })
                         strokeStyle.lineDash = lineDash;
                         break;
@@ -86,6 +101,10 @@ class Convertor {
             });
         });
         return strokeStyle;
+    }
+
+    _roundNumber(n, places) {
+        return +(Math.round(n + "e+"+places)  + "e-"+places);
     }
 
     _ogcFilterToObject(ogcFilter) {
@@ -163,9 +182,8 @@ if (require.main === module){
 
     program
         .version('0.0.1')
-        .option('-p, --path [type]', 'Define the path of the input file/directory')
-        .option('-o, --output [type]', 'Define the paht of the output file/directory, not needed when input is directory')
-        .option('-c, --conversion [type]', 'Define the conversion [html2json, json2html]')
+        .option('-s, --style [type]', 'Define the sld to be transformed')
+        .option('-v, --schemaVersion [type]', '[7, 9] the version of the schema for SLDs')
         .parse(process.argv);
 
     let convertor = new Convertor(program);
