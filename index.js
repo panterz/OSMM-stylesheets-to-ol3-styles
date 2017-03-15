@@ -121,8 +121,9 @@ class Convertor {
                 let attribute = ogcFilter[key][propertyName];
                 let value = parseInt(ogcFilter[key][propertyLiteral]);
 
-                filter.operator = operator;
-                filter[attribute] = value;
+                //filter.operator = operator;
+                filter.value = value;
+                filter.attribute = attribute;
             }
         });
 
